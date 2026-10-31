@@ -3,7 +3,9 @@
 namespace ErnestDefoe\Flarumverse\Http;
 
 use ErnestDefoe\Flarumverse\Address;
+use ErnestDefoe\Flarumverse\Directory;
 use ErnestDefoe\Flarumverse\Identity;
+use ErnestDefoe\Flarumverse\Listing;
 use ErnestDefoe\Flarumverse\Pairing;
 use ErnestDefoe\Flarumverse\Partner;
 use ErnestDefoe\Flarumverse\Threads;
@@ -32,6 +34,7 @@ class InboxController implements RequestHandlerInterface
         protected Pairing $pairing,
         protected Threads $threads,
         protected Cache $cache,
+        protected Directory $directory,
     ) {
     }
 
@@ -54,12 +57,17 @@ class InboxController implements RequestHandlerInterface
             return self::error('bad_request', 400);
         }
 
+        $type = $message['type'];
         $partner = Partner::forUrl($from);
+        $listing = $this->directory->isHost() ? Listing::query()->where('url', $from)->first() : null;
         $about = null;
         $key = $partner?->public_key;
 
-        if ($message['type'] === 'pair-request' && ! in_array($partner?->status, [Partner::PAIRED, Partner::OUTGOING], true)) {
-            if (! $this->strangerAllowed($from)) {
+        // Messages a forum we don't know yet may send: fetch its key, after the daily cap.
+        $stranger = ($type === 'pair-request' && ! in_array($partner?->status, [Partner::PAIRED, Partner::OUTGOING], true))
+            || ($type === 'directory-join' && $this->directory->isHost());
+        if ($stranger) {
+            if (($type === 'pair-request' || $listing === null) && ! $this->strangerAllowed($from)) {
                 return self::error('busy', 429);
             }
             $about = $this->remote->about($from);
@@ -69,11 +77,30 @@ class InboxController implements RequestHandlerInterface
                 return self::error('not_a_flarumverse_forum', 422);
             }
             $key = $about['publicKey'];
+        } elseif ($type === 'directory-leave') {
+            $key = $listing?->public_key;
+        } elseif ($type === 'directory-status') {
+            $key = $from === $this->directory->host() ? $this->directory->hostKey() : null;
         }
 
         $target = $this->identity->url().Protocol::PATH.'/inbox';
         if ($key === null || ! $this->protocol->verify('POST', $target, $headers, $body, $key, $receivedAt)) {
             return self::error('bad_signature', 401);
+        }
+
+        switch ($type) {
+            case 'directory-join':
+                $reply = $this->directory->join($about, $listing);
+
+                return new JsonResponse($reply, isset($reply['error']) ? 409 : 202);
+            case 'directory-leave':
+                $listing?->delete();
+
+                return new JsonResponse(['status' => 'removed'], 202);
+            case 'directory-status':
+                $this->directory->setStatus((string) ($message['status'] ?? ''));
+
+                return new JsonResponse(['status' => 'ok'], 202);
         }
 
         if ($about !== null) {
@@ -85,7 +112,7 @@ class InboxController implements RequestHandlerInterface
             return self::error('not_paired', 403);
         }
 
-        match ($message['type']) {
+        match ($type) {
             'pair-request' => null, // already paired, or crossed requests: handled when we asked
             'pair-accept' => $this->pairing->accepted($partner),
             'pair-decline' => $this->pairing->refused($partner),

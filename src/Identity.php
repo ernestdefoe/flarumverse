@@ -46,6 +46,14 @@ class Identity
         return mb_substr((string) $this->settings->get('forum_description'), 0, 300);
     }
 
+    /** The forum's logo and favicon as absolute URLs, when set. */
+    public function asset(string $setting): ?string
+    {
+        $path = (string) $this->settings->get($setting);
+
+        return $path === '' ? null : resolve('filesystem')->disk('flarum-assets')->url($path);
+    }
+
     public function publicKey(): string
     {
         $this->keys();

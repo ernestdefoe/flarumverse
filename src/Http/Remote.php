@@ -28,7 +28,7 @@ class Remote
     /**
      * A forum's public description, or null when it isn't a Flarumverse forum.
      *
-     * @return array{url:string,name:string,description:string,publicKey:string}|null
+     * @return array{url:string,name:string,description:string,publicKey:string,logo:string|null,icon:string|null,directory:array<string,mixed>|null}|null
      */
     public function about(string $base): ?array
     {
@@ -49,6 +49,10 @@ class Remote
             'name' => mb_substr(trim((string) ($doc['name'] ?? '')), 0, 100) ?: (string) parse_url($url, PHP_URL_HOST),
             'description' => mb_substr(trim((string) ($doc['description'] ?? '')), 0, 300),
             'publicKey' => (string) $doc['publicKey'],
+            'logo' => is_string($doc['logo'] ?? null) ? $doc['logo'] : null,
+            'icon' => is_string($doc['icon'] ?? null) ? $doc['icon'] : null,
+            // Present only while the forum asks to be in the directory.
+            'directory' => is_array($doc['directory'] ?? null) ? $doc['directory'] : null,
         ];
     }
 

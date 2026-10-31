@@ -28,9 +28,9 @@ class Threads
     }
 
     /** @return list<array<string,mixed>> this forum's latest shared discussions */
-    public function latest(): array
+    public function latest(int $limit = self::LIMIT): array
     {
-        return array_map([$this, 'payload'], $this->shared()->latest('created_at')->limit(self::LIMIT)->get()->all());
+        return array_map([$this, 'payload'], $this->shared()->latest('discussions.created_at')->limit($limit)->get()->all());
     }
 
     /** @return array<string,mixed>|null one discussion, if a guest could read it */
@@ -145,7 +145,7 @@ class Threads
         FlarumverseThread::query()->upsert([$row], ['partner_id', 'remote_id'], ['title', 'excerpt', 'author', 'tag', 'replies', 'url', 'posted_at']);
     }
 
-    private static function text(mixed $value, int $max): ?string
+    public static function text(mixed $value, int $max): ?string
     {
         if (! is_string($value) && ! is_int($value)) {
             return null;

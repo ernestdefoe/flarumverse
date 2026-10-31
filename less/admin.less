@@ -90,3 +90,70 @@
     align-items: stretch;
   }
 }
+
+.FlarumverseAdmin {
+  .FlarumverseAdmin-pickers {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 12px 0;
+
+    label {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex: 1 1 220px;
+      min-width: 0;
+      font-weight: 600;
+    }
+    select {
+      max-width: 100%;
+    }
+  }
+  .FlarumverseAdmin-dirSave {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-top: 12px;
+    color: var(--muted-color);
+  }
+  .FlarumverseAdmin-dirStatus {
+    color: var(--text-color);
+    font-weight: 600;
+  }
+  .FlarumverseAdmin-group {
+    margin-top: 12px;
+
+    h4 {
+      margin-bottom: 2px;
+    }
+  }
+}
+
+.FlarumverseAdmin .FlarumverseAdmin-logoPreview {
+  flex: 1 1 100%;
+
+  .FlarumverseAdmin-logoBand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 88px;
+    max-width: 340px;
+    padding: 14px 20px;
+    border: 1px solid var(--control-bg);
+    border-radius: 12px;
+
+    &.is-light {
+      background: #fff;
+    }
+    &.is-dark {
+      background: #1d1f24;
+    }
+    img {
+      max-width: 100%;
+      max-height: 56px;
+      object-fit: contain;
+    }
+  }
+}

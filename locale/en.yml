@@ -9,6 +9,22 @@ ernestdefoe-flarumverse:
       load_more: Load more
       replies: "{count, plural, one {# reply} other {# replies}}"
       on_forum: "on {forum}"
+    directory:
+      title: Find a forum
+      nav: Find a forum
+      intro: Independent communities running on Flarum. Each one is run by its own owners. Click one to visit and join.
+      search: Search forums
+      all_topics: All topics
+      all_languages: All languages
+      several_languages: Several languages
+      members: "{count, plural, one {# member} other {# members}}"
+      discussions: "{count, plural, one {# discussion} other {# discussions}}"
+      active: Active {ago}
+      latest: Recent discussions
+      empty: No forums match.
+      load_more: Load more
+      visit: Visit forum
+      list_yours: Run a Flarum forum? Install Flarumverse and tick "List my forum" to appear here.
 
   admin:
     your_address: "Your forum's address:"
@@ -41,6 +57,39 @@ ernestdefoe-flarumverse:
       asked: Asked {ago}
       unreachable: "Can't reach this forum at the moment ({error}). Flarumverse keeps trying."
       confirm_remove: "Stop pairing with {name}? Each forum stops showing the other's discussions."
+    directory:
+      heading: Flarumverse directory
+      help: "List your forum on {host}/forums, where people looking for a community browse forums by topic and language. Your forum's name, description, number of members and discussions, and its three newest discussion titles are shown. Every listing is approved by hand first."
+      listed: List my forum in the directory
+      topic: Topic
+      language: Language
+      logo_bg: Logo background
+      logo_bg_help: Pick what your logo was drawn to sit on, so it stays readable on your directory card.
+      logo_bg_light: Light
+      logo_bg_dark: Dark
+      logo_bg_brand: Your primary color
+      pick: Choose…
+      several_languages: Several languages
+      save: Save
+      saved: Saved.
+      status:
+        pending: Waiting for approval.
+        approved: Listed. Your forum is in the directory.
+        rejected: Not accepted for the directory.
+        removed: Removed from the directory.
+    listings:
+      heading: Directory listings
+      help: Forums asking to be listed on this forum's /forums page. Only approved forums are shown there.
+      pending: Waiting for approval
+      approved: Listed
+      rejected: Rejected
+      none: No forums have asked to be listed yet.
+      approve: Approve
+      reject: Reject
+      remove: Remove
+      unreachable: Unreachable at the last check
+      stats: "{members} members · {discussions} discussions"
+      view: View the directory
     how:
       heading: How it works
       items:
@@ -57,3 +106,30 @@ ernestdefoe-flarumverse:
     they_are_full: That forum already has as many partners as it can.
     they_are_busy: That forum is getting a lot of requests. Try again tomorrow.
     we_are_full: "You already have {max} partners, the most Flarumverse allows."
+    directory_pick: Choose a topic and a language for your listing.
+    directory_failed: The directory couldn't be reached. Try again later.
+
+  lib:
+    topics:
+      general: General discussion
+      gaming: Gaming
+      sports: Sports
+      technology: Technology
+      development: Software and web development
+      science: Science
+      entertainment: Movies and TV
+      music: Music
+      books: Books and writing
+      art: Art and design
+      hobbies: Hobbies and crafts
+      home: Home and garden
+      food: Food and drink
+      travel: Travel
+      cars: Cars and motorsport
+      health: Health and fitness
+      business: Business and money
+      education: Education
+      society: News, politics and society
+      faith: Religion and philosophy
+      support: Product support
+      other: Other

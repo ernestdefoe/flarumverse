@@ -2,6 +2,7 @@
 
 namespace ErnestDefoe\Flarumverse\Api;
 
+use ErnestDefoe\Flarumverse\Directory;
 use ErnestDefoe\Flarumverse\Identity;
 use ErnestDefoe\Flarumverse\Pairing;
 use ErnestDefoe\Flarumverse\Partner;
@@ -19,15 +20,14 @@ use Psr\Http\Server\RequestHandlerInterface;
  *   POST   /api/flarumverse/partners       {url}: ask a forum to pair
  *   PATCH  /api/flarumverse/partners/{id}  {action: approve|decline}
  *   DELETE /api/flarumverse/partners/{id}  end the pairing / cancel / forget
+ *   PUT    /api/flarumverse/partners       {listed, topic, language}: the directory opt-in
  */
 class PartnersController implements RequestHandlerInterface
 {
-    /** Where a new forum starts: Ernest's support site (scope, section 7). */
-    public const SUGGESTED = ['https://ernestdefoe.online'];
-
     public function __construct(
         protected Pairing $pairing,
         protected Identity $identity,
+        protected Directory $directory,
     ) {
     }
 
@@ -45,6 +45,9 @@ class PartnersController implements RequestHandlerInterface
             case 'PATCH':
                 $partner = Partner::query()->findOrFail($id);
                 Arr::get($body, 'action') === 'approve' ? $this->pairing->approve($partner) : $this->pairing->decline($partner);
+                break;
+            case 'PUT': // the directory opt-in
+                $this->directory->save((bool) Arr::get($body, 'listed'), (string) Arr::get($body, 'topic', ''), (string) Arr::get($body, 'language', ''), (string) Arr::get($body, 'logoBg', 'light'));
                 break;
             case 'DELETE':
                 $this->pairing->remove(Partner::query()->findOrFail($id));
@@ -64,6 +67,7 @@ class PartnersController implements RequestHandlerInterface
         return [
             'url' => $this->identity->url(),
             'max' => Pairing::MAX_PARTNERS,
+            'directory' => $this->directory->state(),
             'partners' => $partners->map(fn (Partner $p) => [
                 'id' => $p->id,
                 'url' => $p->url,
@@ -76,7 +80,7 @@ class PartnersController implements RequestHandlerInterface
                 'lastError' => $p->status === Partner::PAIRED && $p->failures > 0 ? $p->last_error : null,
             ])->all(),
             'suggestions' => array_values(array_filter(
-                self::SUGGESTED,
+                [$this->directory->host()],
                 fn ($url) => $url !== $this->identity->url() && ! in_array($url, $known, true),
             )),
         ];
