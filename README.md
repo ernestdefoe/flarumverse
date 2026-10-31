@@ -7,6 +7,10 @@ Flarum forums pair with each other and show each other's new discussions. Every 
 - **Always current:** Flarumverse refreshes every partner every 15 minutes through Flarum's scheduler, so edits and deletions follow. With a queue worker running, new discussions arrive within seconds.
 - **The directory:** tick "List my forum" to appear on [ernestdefoe.online/forums](https://ernestdefoe.online/forums), where people looking for a community browse Flarum forums by topic and language. Opt-in, approved by hand, and you can leave at any time.
 
+![The Flarumverse directory](screenshots/directory.png)
+
+![A forum's Flarumverse page](screenshots/flarumverse-page.png)
+
 ## Install
 
 ```sh
