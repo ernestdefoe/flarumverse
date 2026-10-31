@@ -4,6 +4,7 @@ namespace ErnestDefoe\Flarumverse\Http;
 
 use ErnestDefoe\Flarumverse\Address;
 use ErnestDefoe\Flarumverse\Directory;
+use ErnestDefoe\Flarumverse\FlarumverseThread;
 use ErnestDefoe\Flarumverse\Identity;
 use ErnestDefoe\Flarumverse\Listing;
 use ErnestDefoe\Flarumverse\Pairing;
@@ -126,7 +127,12 @@ class InboxController implements RequestHandlerInterface
 
     private function thread(Partner $partner, mixed $thread): void
     {
-        if ($partner->status === Partner::PAIRED && ($row = Threads::clean($thread, $partner))) {
+        if ($partner->status !== Partner::PAIRED || ! ($row = Threads::clean($thread, $partner))) {
+            return;
+        }
+        // A pull keeps 50 per partner; pushes between pulls can't grow that without bound.
+        $known = FlarumverseThread::query()->where('partner_id', $partner->id)->where('remote_id', $row['remote_id'])->exists();
+        if ($known || FlarumverseThread::query()->where('partner_id', $partner->id)->count() < 2 * Threads::LIMIT) {
             $this->threads->upsert($row);
         }
     }

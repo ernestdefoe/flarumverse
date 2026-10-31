@@ -8,7 +8,6 @@ ernestdefoe-flarumverse:
       empty: No discussions from paired forums yet.
       load_more: Load more
       replies: "{count, plural, one {# reply} other {# replies}}"
-      on_forum: "on {forum}"
     directory:
       title: Find a forum
       nav: Find a forum
