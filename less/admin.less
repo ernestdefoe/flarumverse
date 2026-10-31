@@ -1,0 +1,92 @@
+.FlarumverseAdmin {
+  max-width: 760px;
+  padding-top: 20px;
+  padding-bottom: 40px;
+
+  .FlarumverseAdmin-address {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin: 12px 0 24px;
+
+    code {
+      overflow-wrap: anywhere;
+    }
+  }
+  .FlarumverseAdmin-section {
+    margin-bottom: 28px;
+
+    h3 {
+      margin-bottom: 10px;
+    }
+  }
+  .FlarumverseAdmin-pair {
+    display: flex;
+    gap: 8px;
+
+    .FormControl {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+  }
+  .FlarumverseAdmin-error {
+    margin-top: 8px;
+    color: var(--validation-error-color, #d83e3e);
+  }
+  .FlarumverseAdmin-notice {
+    margin-top: 8px;
+    color: var(--text-color);
+  }
+  .FlarumverseAdmin-suggestions {
+    margin-top: 16px;
+
+    h4 {
+      margin-bottom: 2px;
+    }
+  }
+  .FlarumverseAdmin-how {
+    padding-left: 20px;
+    color: var(--muted-color);
+  }
+}
+
+.FlarumversePartner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--control-bg);
+
+  .FlarumversePartner-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-width: 0;
+    gap: 2px;
+  }
+  .FlarumversePartner-url,
+  .FlarumversePartner-meta,
+  .FlarumversePartner-description {
+    color: var(--muted-color);
+    font-size: 13px;
+    overflow-wrap: anywhere;
+  }
+  .FlarumversePartner-error {
+    color: var(--validation-error-color, #d83e3e);
+    font-size: 13px;
+  }
+  .FlarumversePartner-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 767px) {
+  .FlarumversePartner {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
