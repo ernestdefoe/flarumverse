@@ -30,7 +30,7 @@ class PullCommand extends Command
             $ok = $pairing->pull($partner);
 
             // Its favicon, logo and colour, once a day (one small request).
-            if ($ok && ($partner->look_checked_at === null || $partner->look_checked_at->lt(Carbon::now()->subDay()))) {
+            if (($partner->look_checked_at === null || $partner->look_checked_at->lt(Carbon::now()->subDay()))) {
                 $about = $remote->about($partner->url);
                 if ($about) {
                     $partner->applyLook($about);
