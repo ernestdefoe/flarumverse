@@ -3,7 +3,7 @@ import Page from 'flarum/common/components/Page';
 import PageStructure from 'flarum/forum/components/PageStructure';
 import IndexSidebar from 'flarum/forum/components/IndexSidebar';
 import Button from 'flarum/common/components/Button';
-import Select from 'flarum/common/components/Select';
+import Icon from 'flarum/common/components/Icon';
 import LoadingIndicator from 'flarum/common/components/LoadingIndicator';
 import Placeholder from 'flarum/common/components/Placeholder';
 import humanTime from 'flarum/common/helpers/humanTime';
@@ -68,45 +68,106 @@ export default class FlarumversePage extends Page {
       );
   }
 
+  /** A forum's accent: a hue picked from its id, so each forum keeps its colour. */
+  static accent(id: number): string {
+    return `hsl(${(id * 137) % 360}, 58%, 46%)`;
+  }
+
+  static host(url: string | undefined): string {
+    try {
+      return url ? new URL(url).host.replace(/^www\./, '') : '';
+    } catch (e) {
+      return '';
+    }
+  }
+
+  chip(id: string, label: Mithril.Children, accent?: string) {
+    const active = this.partner === id;
+    return (
+      <button
+        type="button"
+        className={'FlarumverseChip' + (active ? ' FlarumverseChip--active' : '')}
+        aria-pressed={active}
+        style={accent ? { '--fv-accent': accent } : undefined}
+        onclick={() => {
+          if (active) return;
+          this.partner = id;
+          this.load(true);
+        }}
+      >
+        {accent ? <span className="FlarumverseChip-dot" /> : null}
+        {label}
+      </button>
+    );
+  }
+
   view() {
-    const options: Record<string, string> = { '0': extractText(t('all_forums')) };
-    this.partners.forEach((p) => (options[String(p.id)] = p.name));
+    const partners = new Map(this.partners.map((p) => [p.id, p]));
 
     return (
       <PageStructure className="FlarumversePage" sidebar={() => <IndexSidebar />}>
-        <div className="FlarumversePage-head">
-          <p className="FlarumversePage-intro">{t('intro', { forum: app.forum.attribute('title') })}</p>
-          {this.partners.length > 1 ? (
-            <Select
-              className="FlarumversePage-filter"
-              options={options}
-              value={this.partner}
-              onchange={(value: string) => {
-                this.partner = value;
-                this.load(true);
-              }}
-            />
-          ) : null}
-        </div>
+        <header className="FlarumverseHero">
+          <span className="FlarumverseHero-icon" aria-hidden="true">
+            <Icon name="fas fa-satellite-dish" />
+          </span>
+          <div className="FlarumverseHero-text">
+            <h2 className="FlarumverseHero-title">{t('title')}</h2>
+            <p className="FlarumverseHero-intro">{t('intro', { forum: app.forum.attribute('title') })}</p>
+          </div>
+        </header>
+
+        {this.partners.length > 1 ? (
+          <div className="FlarumverseChips" role="group" aria-label={extractText(t('filter'))}>
+            {this.chip('0', t('all_forums'))}
+            {this.partners.map((p) => this.chip(String(p.id), p.name, FlarumversePage.accent(p.id)))}
+          </div>
+        ) : null}
 
         {this.threads.length === 0 && !this.loading ? <Placeholder text={t('empty')} /> : null}
 
         <ul className="FlarumverseList">
-          {this.threads.map((thread) => (
-            <li key={thread.id} className="FlarumverseItem">
-              <a className="FlarumverseItem-link" href={thread.url} rel="noopener ugc">
-                <span className="FlarumverseItem-forum">{thread.forum}</span>
-                <span className="FlarumverseItem-title">{thread.title}</span>
-                {thread.excerpt ? <span className="FlarumverseItem-excerpt">{thread.excerpt}</span> : null}
-                <span className="FlarumverseItem-meta">
-                  {thread.author ? <span>{thread.author}</span> : null}
-                  {thread.tag ? <span>{thread.tag}</span> : null}
-                  <span>{t('replies', { count: thread.replies })}</span>
-                  <span>{humanTime(new Date(thread.postedAt))}</span>
-                </span>
-              </a>
-            </li>
-          ))}
+          {this.threads.map((thread) => {
+            const partner = partners.get(thread.partner);
+            const host = FlarumversePage.host(partner?.url || thread.url);
+            const name = thread.forum || host;
+
+            return (
+              <li key={thread.id} className="FlarumverseItem" style={{ '--fv-accent': FlarumversePage.accent(thread.partner) }}>
+                <a className="FlarumverseItem-link" href={thread.url} rel="noopener ugc">
+                  <span className="FlarumverseItem-avatar" aria-hidden="true">
+                    {(name || '?').trim().charAt(0).toUpperCase()}
+                  </span>
+                  <span className="FlarumverseItem-body">
+                    <span className="FlarumverseItem-source">
+                      <span className="FlarumverseItem-forum">{name}</span>
+                      {host && host !== name ? <span className="FlarumverseItem-host">{host}</span> : null}
+                      <span className="FlarumverseItem-time">{humanTime(new Date(thread.postedAt))}</span>
+                    </span>
+                    <span className="FlarumverseItem-title">{thread.title}</span>
+                    {thread.excerpt ? <span className="FlarumverseItem-excerpt">{thread.excerpt}</span> : null}
+                    <span className="FlarumverseItem-meta">
+                      {thread.author ? (
+                        <span className="FlarumverseItem-pill">
+                          <Icon name="far fa-user" /> {thread.author}
+                        </span>
+                      ) : null}
+                      {thread.tag ? (
+                        <span className="FlarumverseItem-pill">
+                          <Icon name="fas fa-tag" /> {thread.tag}
+                        </span>
+                      ) : null}
+                      <span className="FlarumverseItem-pill">
+                        <Icon name="far fa-comment" /> {t('replies', { count: thread.replies })}
+                      </span>
+                      <span className="FlarumverseItem-open">
+                        {t('open_on', { forum: name })} <Icon name="fas fa-arrow-up-right-from-square" />
+                      </span>
+                    </span>
+                  </span>
+                </a>
+              </li>
+            );
+          })}
         </ul>
 
         {this.loading ? <LoadingIndicator /> : null}

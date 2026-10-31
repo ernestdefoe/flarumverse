@@ -7,6 +7,8 @@ ernestdefoe-flarumverse:
       all_forums: All forums
       empty: No discussions from paired forums yet.
       load_more: Load more
+      filter: Show discussions from
+      open_on: "Opens on {forum}"
       replies: "{count, plural, one {# reply} other {# replies}}"
     directory:
       title: Find a forum
