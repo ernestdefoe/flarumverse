@@ -58,7 +58,7 @@ const languageName = (code: string) => lang(code, app.translator.getLocale(), ex
  * suggested first partner), requests to approve, partners, and requests waiting.
  */
 export default class FlarumverseAdminPage extends ExtensionPage {
-  state: State | null = null;
+  data: State | null = null;
   address = '';
   busy: string | null = null;
   error: string | null = null;
@@ -80,7 +80,7 @@ export default class FlarumverseAdminPage extends ExtensionPage {
       .request<State>({ method, url: app.forum.attribute('apiUrl') + '/flarumverse/partners' + path, body, errorHandler: () => {} } as any)
       .then(
         (state) => {
-          if (state) this.state = state;
+          if (state) this.data = state;
           if (state && !this.dir)
             this.dir = {
               listed: state.directory.listed,
@@ -89,7 +89,7 @@ export default class FlarumverseAdminPage extends ExtensionPage {
               logoBg: state.directory.logoBg,
             };
           if (state?.directory.isHost && this.listings === null) this.loadListings();
-          if (method === 'DELETE') return this.call('GET');
+          return method === 'DELETE' ? this.call('GET') : undefined;
         },
         (e: any) => {
           this.error = e?.response?.errors?.[0]?.detail || extractText(app.translator.trans('core.lib.error.generic_message'));
@@ -106,7 +106,7 @@ export default class FlarumverseAdminPage extends ExtensionPage {
     this.error = this.notice = null;
     this.call('POST', '', { url }).then(() => {
       if (this.error) return;
-      const added = this.state?.partners.find((p) => p.url.replace(/^https:\/\//, '') === url.replace(/^https?:\/\//, '').replace(/\/+$/, ''));
+      const added = this.data?.partners.find((p) => p.url.replace(/^https:\/\//, '') === url.replace(/^https?:\/\//, '').replace(/\/+$/, ''));
       this.notice = extractText(t('pair.sent', { name: added?.name || url }));
       this.address = '';
     });
@@ -120,7 +120,7 @@ export default class FlarumverseAdminPage extends ExtensionPage {
   }
 
   content() {
-    const s = this.state;
+    const s = this.data;
     if (!s)
       return (
         <div className="container">
@@ -337,7 +337,7 @@ export default class FlarumverseAdminPage extends ExtensionPage {
       .request<State>({ method: 'PUT', url: app.forum.attribute('apiUrl') + '/flarumverse/partners', body: f, errorHandler: () => {} } as any)
       .then(
         (state) => {
-          this.state = state;
+          this.data = state;
           this.dir = {
             listed: state.directory.listed,
             topic: state.directory.topic,
@@ -462,8 +462,8 @@ export default class FlarumverseAdminPage extends ExtensionPage {
           {p.description ? <span className="FlarumversePartner-description">{p.description}</span> : null}
           <span className="FlarumversePartner-meta">
             {p.status === 'paired'
-              ? [t('partner.paired_since', { ago: humanTime(p.pairedAt!) }), ' · ', t('partner.threads', { count: p.threads })]
-              : t('partner.asked', { ago: humanTime(p.updatedAt) })}
+              ? [t('partner.paired_since', { ago: humanTime(new Date(p.pairedAt!)) }), ' · ', t('partner.threads', { count: p.threads })]
+              : t('partner.asked', { ago: humanTime(new Date(p.updatedAt)) })}
           </span>
           {p.lastError ? <span className="FlarumversePartner-error">{t('partner.unreachable', { error: p.lastError })}</span> : null}
         </div>

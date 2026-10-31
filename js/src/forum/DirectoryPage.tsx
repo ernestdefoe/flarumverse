@@ -175,7 +175,7 @@ export default class DirectoryPage extends Page {
                   </span>
                   {f.lastActivity ? (
                     <span>
-                      <Icon name="far fa-clock" /> {t('active', { ago: humanTime(f.lastActivity) })}
+                      <Icon name="far fa-clock" /> {t('active', { ago: humanTime(new Date(f.lastActivity)) })}
                     </span>
                   ) : null}
                 </div>

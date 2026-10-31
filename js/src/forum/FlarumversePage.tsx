@@ -102,7 +102,7 @@ export default class FlarumversePage extends Page {
                   {thread.author ? <span>{thread.author}</span> : null}
                   {thread.tag ? <span>{thread.tag}</span> : null}
                   <span>{t('replies', { count: thread.replies })}</span>
-                  <span>{humanTime(thread.postedAt)}</span>
+                  <span>{humanTime(new Date(thread.postedAt))}</span>
                 </span>
               </a>
             </li>
