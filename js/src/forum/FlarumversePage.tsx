@@ -26,7 +26,7 @@ type Thread = {
   url: string;
   postedAt: string;
 };
-type PartnerRef = { id: number; name: string; url: string };
+type PartnerRef = { id: number; name: string; url: string; icon?: string | null; color?: string | null };
 
 /** /flarumverse: the newest discussions from paired forums, newest first. */
 export default class FlarumversePage extends Page {
@@ -35,6 +35,8 @@ export default class FlarumversePage extends Page {
   partner = '0';
   more = false;
   loading = true;
+  /** Partners whose favicon didn't load: they show their initial instead. */
+  broken = new Set<number>();
 
   oninit(vnode: Mithril.Vnode) {
     super.oninit(vnode);
@@ -68,9 +70,9 @@ export default class FlarumversePage extends Page {
       );
   }
 
-  /** A forum's accent: a hue picked from its id, so each forum keeps its colour. */
-  static accent(id: number): string {
-    return `hsl(${(id * 137) % 360}, 58%, 46%)`;
+  /** A forum's accent: its own brand colour, else a hue picked from its id so it keeps one. */
+  static accent(id: number, color?: string | null): string {
+    return color && /^#[0-9a-f]{6}$/i.test(color) ? color : `hsl(${(id * 137) % 360}, 58%, 46%)`;
   }
 
   static host(url: string | undefined): string {
@@ -119,7 +121,7 @@ export default class FlarumversePage extends Page {
         {this.partners.length > 1 ? (
           <div className="FlarumverseChips" role="group" aria-label={extractText(t('filter'))}>
             {this.chip('0', t('all_forums'))}
-            {this.partners.map((p) => this.chip(String(p.id), p.name, FlarumversePage.accent(p.id)))}
+            {this.partners.map((p) => this.chip(String(p.id), p.name, FlarumversePage.accent(p.id, p.color)))}
           </div>
         ) : null}
 
@@ -132,10 +134,24 @@ export default class FlarumversePage extends Page {
             const name = thread.forum || host;
 
             return (
-              <li key={thread.id} className="FlarumverseItem" style={{ '--fv-accent': FlarumversePage.accent(thread.partner) }}>
+              <li key={thread.id} className="FlarumverseItem" style={{ '--fv-accent': FlarumversePage.accent(thread.partner, partner?.color) }}>
                 <a className="FlarumverseItem-link" href={thread.url} rel="noopener ugc">
-                  <span className="FlarumverseItem-avatar" aria-hidden="true">
-                    {(name || '?').trim().charAt(0).toUpperCase()}
+                  <span
+                    className={'FlarumverseItem-avatar' + (partner?.icon && !this.broken.has(thread.partner) ? ' FlarumverseItem-avatar--icon' : '')}
+                    aria-hidden="true"
+                  >
+                    {partner?.icon && !this.broken.has(thread.partner) ? (
+                      <img
+                        src={partner.icon}
+                        alt=""
+                        loading="lazy"
+                        decoding="async"
+                        referrerpolicy="no-referrer"
+                        onerror={() => this.broken.add(thread.partner)}
+                      />
+                    ) : (
+                      (name || '?').trim().charAt(0).toUpperCase()
+                    )}
                   </span>
                   <span className="FlarumverseItem-body">
                     <span className="FlarumverseItem-source">

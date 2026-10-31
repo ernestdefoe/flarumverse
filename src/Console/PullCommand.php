@@ -18,7 +18,7 @@ class PullCommand extends Command
 
     protected $description = 'Fetch the latest shared discussions from every paired forum.';
 
-    public function handle(Pairing $pairing): int
+    public function handle(Pairing $pairing, \ErnestDefoe\Flarumverse\Http\Remote $remote): int
     {
         $partners = Partner::query()->where('status', Partner::PAIRED)->orderBy('last_attempt_at')->get();
 
@@ -28,6 +28,17 @@ class PullCommand extends Command
                 continue;
             }
             $ok = $pairing->pull($partner);
+
+            // Its favicon, logo and colour, once a day (one small request).
+            if ($ok && ($partner->look_checked_at === null || $partner->look_checked_at->lt(Carbon::now()->subDay()))) {
+                $about = $remote->about($partner->url);
+                if ($about) {
+                    $partner->applyLook($about);
+                } else {
+                    $partner->look_checked_at = Carbon::now();
+                }
+                $partner->save();
+            }
             $this->line(($ok ? 'ok   ' : 'fail ').$partner->url);
         }
 

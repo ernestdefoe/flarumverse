@@ -28,7 +28,7 @@ class Remote
     /**
      * A forum's public description, or null when it isn't a Flarumverse forum.
      *
-     * @return array{url:string,name:string,description:string,publicKey:string,logo:string|null,icon:string|null,directory:array<string,mixed>|null}|null
+     * @return array{url:string,name:string,description:string,publicKey:string,logo:string|null,icon:string|null,color:string|null,directory:array<string,mixed>|null}|null
      */
     public function about(string $base): ?array
     {
@@ -51,6 +51,7 @@ class Remote
             'publicKey' => (string) $doc['publicKey'],
             'logo' => is_string($doc['logo'] ?? null) ? $doc['logo'] : null,
             'icon' => is_string($doc['icon'] ?? null) ? $doc['icon'] : null,
+            'color' => is_string($doc['color'] ?? null) && preg_match('/^#[0-9a-f]{6}$/i', $doc['color']) ? strtolower($doc['color']) : null,
             // Present only while the forum asks to be in the directory.
             'directory' => is_array($doc['directory'] ?? null) ? $doc['directory'] : null,
         ];

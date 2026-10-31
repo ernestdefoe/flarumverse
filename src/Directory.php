@@ -295,6 +295,7 @@ class Directory
             'publicKey' => $this->identity->publicKey(),
             'logo' => $this->identity->asset('logo_path'),
             'icon' => $this->identity->asset('favicon_path'),
+            'color' => $this->identity->color(),
             'directory' => $this->profile(),
         ];
     }

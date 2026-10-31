@@ -27,6 +27,7 @@ class AboutController implements RequestHandlerInterface
             'description' => $this->identity->description(),
             'logo' => $this->identity->asset('logo_path'),
             'icon' => $this->identity->asset('favicon_path'),
+            'color' => $this->identity->color(),
             'publicKey' => $this->identity->publicKey(),
             'directory' => $this->directory->profile(),
         ], 200, ['Cache-Control' => 'public, max-age=300']);

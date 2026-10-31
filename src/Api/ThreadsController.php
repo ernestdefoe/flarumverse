@@ -33,7 +33,7 @@ class ThreadsController implements RequestHandlerInterface
             ->limit(self::PAGE + 1)
             ->get();
 
-        $partners = Partner::query()->where('status', Partner::PAIRED)->orderBy('name')->get(['id', 'name', 'url']);
+        $partners = Partner::query()->where('status', Partner::PAIRED)->orderBy('name')->get(['id', 'name', 'url', 'icon', 'color']);
         $names = $partners->keyBy('id');
 
         return new JsonResponse([
@@ -49,7 +49,7 @@ class ThreadsController implements RequestHandlerInterface
                 'url' => $t->url,
                 'postedAt' => $t->posted_at->toIso8601String(),
             ])->values()->all(),
-            'partners' => $partners->map(fn (Partner $p) => ['id' => $p->id, 'name' => $p->name, 'url' => $p->url])->all(),
+            'partners' => $partners->map(fn (Partner $p) => ['id' => $p->id, 'name' => $p->name, 'url' => $p->url, 'icon' => $p->icon, 'color' => $p->color])->all(),
             'more' => $threads->count() > self::PAGE,
         ]);
     }

@@ -57,6 +57,7 @@ class Pairing
         $partner->name = $about['name'];
         $partner->description = $about['description'] ?: null;
         $partner->public_key = $about['publicKey'];
+        $partner->applyLook($about);
         $partner->status = Partner::OUTGOING;
         $partner->save();
 
@@ -140,6 +141,7 @@ class Pairing
         $partner->name = $about['name'];
         $partner->description = $about['description'] ?: null;
         $partner->public_key = $about['publicKey'];
+        $partner->applyLook($about);
         $partner->status = Partner::INCOMING;
         $partner->save();
 

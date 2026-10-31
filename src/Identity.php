@@ -46,6 +46,14 @@ class Identity
         return mb_substr((string) $this->settings->get('forum_description'), 0, 300);
     }
 
+    /** The forum's brand colour (its primary colour), as #rrggbb, when set. */
+    public function color(): ?string
+    {
+        $color = strtolower((string) $this->settings->get('theme_primary_color'));
+
+        return preg_match('/^#[0-9a-f]{6}$/', $color) ? $color : null;
+    }
+
     /** The forum's logo and favicon as absolute URLs, when set. */
     public function asset(string $setting): ?string
     {

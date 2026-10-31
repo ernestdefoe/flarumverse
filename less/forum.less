@@ -138,6 +138,18 @@ ul.FlarumverseList {
     font-size: 17px;
     font-weight: 700;
   }
+  // The forum's own favicon, on a plain tile so any icon reads.
+  .FlarumverseItem-avatar--icon {
+    background: var(--control-bg);
+    border-radius: 10px;
+    overflow: hidden;
+
+    img {
+      width: 26px;
+      height: 26px;
+      object-fit: contain;
+    }
+  }
   .FlarumverseItem-body {
     flex: 1 1 auto;
     min-width: 0;
@@ -238,6 +250,10 @@ ul.FlarumverseList {
       width: 32px;
       height: 32px;
       font-size: 14px;
+    }
+    .FlarumverseItem-avatar--icon img {
+      width: 22px;
+      height: 22px;
     }
     .FlarumverseItem-title {
       font-size: 16px;
