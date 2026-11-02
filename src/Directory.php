@@ -10,6 +10,7 @@ use Flarum\Settings\SettingsRepositoryInterface;
 use Flarum\User\Guest;
 use Flarum\User\User;
 use Illuminate\Contracts\Cache\Repository as Cache;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * The opt-in directory of Flarum forums.
@@ -42,6 +43,7 @@ class Directory
         protected Remote $remote,
         protected Threads $threads,
         protected Cache $cache,
+        protected TranslatorInterface $translator,
     ) {
     }
 
@@ -318,6 +320,6 @@ class Directory
     /** @param array<string,mixed> $params */
     private function trans(string $key, array $params = []): string
     {
-        return resolve('translator')->trans('ernestdefoe-flarumverse.api.'.$key, $params);
+        return $this->translator->trans('ernestdefoe-flarumverse.api.'.$key, $params);
     }
 }

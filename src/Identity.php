@@ -5,6 +5,7 @@ namespace ErnestDefoe\Flarumverse;
 use Flarum\Foundation\Config;
 use Flarum\Http\UrlGenerator;
 use Flarum\Settings\SettingsRepositoryInterface;
+use Illuminate\Contracts\Filesystem\Factory as Filesystem;
 use Illuminate\Database\ConnectionResolverInterface;
 
 /**
@@ -27,6 +28,7 @@ class Identity
         protected UrlGenerator $url,
         protected Config $config,
         protected ConnectionResolverInterface $db,
+        protected Filesystem $filesystem,
     ) {
     }
 
@@ -59,7 +61,7 @@ class Identity
     {
         $path = (string) $this->settings->get($setting);
 
-        return $path === '' ? null : resolve('filesystem')->disk('flarum-assets')->url($path);
+        return $path === '' ? null : $this->filesystem->disk('flarum-assets')->url($path);
     }
 
     public function publicKey(): string

@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use ErnestDefoe\Flarumverse\Http\Remote;
 use Flarum\Foundation\ValidationException;
 use Flarum\Settings\SettingsRepositoryInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Asking, approving, declining and ending pairings, from both ends.
@@ -23,6 +24,7 @@ class Pairing
         protected Identity $identity,
         protected Threads $threads,
         protected SettingsRepositoryInterface $settings,
+        protected TranslatorInterface $translator,
     ) {
     }
 
@@ -228,6 +230,6 @@ class Pairing
     /** @param array<string,mixed> $params */
     private function trans(string $key, array $params = []): string
     {
-        return resolve('translator')->trans('ernestdefoe-flarumverse.api.'.$key, $params);
+        return $this->translator->trans('ernestdefoe-flarumverse.api.'.$key, $params);
     }
 }
